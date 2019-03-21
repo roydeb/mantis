@@ -488,7 +488,7 @@ int mst_query_main(QueryOpts &opt) {
     queryStats.numSamples = sampleNames.size();
     logger->info("Number of experiments: {}", queryStats.numSamples);
 
-    logger->info("Loading our cqf...");
+    logger->info("Loading cqf...");
     CQF<KeyObject> cqf(dbg_file, CQF_FREAD);
     auto indexK = cqf.keybits() / 2;
     if (queryK == 0) queryK = indexK;

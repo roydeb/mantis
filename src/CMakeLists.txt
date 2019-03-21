@@ -5,6 +5,7 @@ add_library(mantis_core STATIC
 		kmer.cc
 		query.cc
 		pistacheServer.cc
+		restServer.cc
 		mstQuery.cc
         validateMST.cc
 		util.cc
