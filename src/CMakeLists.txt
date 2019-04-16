@@ -4,7 +4,6 @@
 add_library(mantis_core STATIC
 		kmer.cc
 		query.cc
-		pistacheServer.cc
 		restServer.cc
 		mstQuery.cc
         validateMST.cc
@@ -50,6 +49,19 @@ target_compile_options(mantis PUBLIC "$<$<AND:$<CONFIG:RELEASE>,$<COMPILE_LANGUA
 target_compile_options(mantis PUBLIC "$<$<AND:$<CONFIG:RELEASE>,$<COMPILE_LANGUAGE:CXX>>:${MANTIS_RELEASE_CXXFLAGS}>")
 target_compile_definitions(mantis PUBLIC "${ARCH_DEFS}")
 
+add_executable(rserver restServer.cc)
+
+target_include_directories(rserver PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
+target_link_libraries(rserver mantis_core)
+target_link_libraries(rserver -lpistache -lpthread)
+target_compile_options(rserver PUBLIC "$<$<AND:$<CONFIG:DEBUG>,$<COMPILE_LANGUAGE:C>>:${MANTIS_DEBUG_CFLAGS}>")
+target_compile_options(rserver PUBLIC "$<$<AND:$<CONFIG:DEBUG>,$<COMPILE_LANGUAGE:CXX>>:${MANTIS_DEBUG_CXXFLAGS}>")
+target_compile_options(rserver PUBLIC "$<$<AND:$<CONFIG:RELEASE>,$<COMPILE_LANGUAGE:C>>:${MANTIS_RELEASE_CFLAGS}>")
+target_compile_options(rserver PUBLIC "$<$<AND:$<CONFIG:RELEASE>,$<COMPILE_LANGUAGE:CXX>>:${MANTIS_RELEASE_CXXFLAGS}>")
+target_compile_definitions(rserver PUBLIC "${ARCH_DEFS}")
+# set_target_properties(rserver PROPERTIES COMPILE_FLAGS -pthread LINK_FLAGS -pthread)
+# set_target_properties(rserver PROPERTIES COMPILE_FLAGS -pthread LINK_FLAGS -pthread LINK_FLAGS -lpistache COMPILE_FLAGS -lpistache)
+
 #add_executable(estimateNumOfKners estimateNumOfKmers.cc)
 #target_include_directories(estimateNumOfKners PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
 #target_link_libraries(estimateNumOfKners mantis_core)
@@ -61,4 +73,7 @@ if (SDSL_INSTALL_PATH)
 endif()
 
 install(TARGETS mantis
+        RUNTIME DESTINATION bin)
+
+install(TARGETS rserver
         RUNTIME DESTINATION bin)

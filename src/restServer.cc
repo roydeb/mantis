@@ -5,17 +5,23 @@
 #include <pistache/router.h>
 #include <pistache/endpoint.h>
 
-using namespace std;
+#include "ProgOpts.h"
+#include "spdlog/spdlog.h"
+#include "mstQuery.h"
+
+// using namespace std;
 using namespace Pistache;
+
+int mst_query_main(QueryOpts &opt);
 
 void printCookies(const Http::Request& req){
     auto cookies = req.cookies();
-    cout << "cookies: [" <<endl;
+    std::cout << "cookies: [" << std::endl;
     const std::string indent(4, ' ');
     for (const auto& c: cookies){
-        cout << indent << c.name << " = "<< c.value << endl;
+        std::cout << indent << c.name << " = "<< c.value << std::endl;
     }
-    cout << "]" <<endl;
+    std::cout << "]" <<std::endl;
 }
 
 class MantisEndpoint{
@@ -70,6 +76,7 @@ private:
         }
         auto query_prefix = request.param(":p");
         std::string qp = query_prefix.as<std::string>();
+        qp = urlDecode(qp);
 
         if (!request.hasParam(":o")) {
             response.send(Http::Code::Bad_Request, "Output file is required\n");
@@ -85,9 +92,18 @@ private:
         std::string ip = input.as<std::string>();
         ip = urlDecode(ip);
 
-        cout << qp << op << ip << endl;
+        std::cout << qp << " " << op << " " << ip << std::endl;
 
-        response.send(Http::Code::Ok, "hello world\n");
+        auto console = spdlog::stdout_color_mt("mantis_console");
+
+        QueryOpts qopt;
+        qopt.console = console;
+        qopt.prefix = qp;
+        qopt.output = op;
+        qopt.query_file = ip;
+        int rp = mst_query_main(qopt);
+        std::cout << rp << std::endl;
+        response.send(Http::Code::Ok, "parameters received\n");
     }
 
     void doAuth(const Rest::Request& request, Http::ResponseWriter response) {
@@ -115,8 +131,8 @@ int main(int argc, char *argv[]) {
 
     Address addr(Ipv4::any(), port);
 
-    cout << "Cores = " << hardware_concurrency() << endl;
-    cout << "Using " << thr << " threads" << endl;
+    std::cout << "Cores = " << hardware_concurrency() << std::endl;
+    std::cout << "Using " << thr << " threads" << std::endl;
 
     MantisEndpoint stats(addr);
 
