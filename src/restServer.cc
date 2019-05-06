@@ -13,6 +13,8 @@
 using namespace Pistache;
 
 int mst_query_main(QueryOpts &opt);
+int build_mst_main (QueryOpts& opt);
+auto console = spdlog::stdout_color_mt("mantis_console");
 
 void printCookies(const Http::Request& req){
     auto cookies = req.cookies();
@@ -51,6 +53,7 @@ private:
         using namespace Rest;
         Routes::Get(router, "/auth", Routes::bind(&MantisEndpoint::doAuth, this));
         Routes::Post(router, "/query/:p/:o/:i", Routes::bind(&MantisEndpoint::doQuery, this));
+        Routes::Post(router, "/build-mst/:p/:t/:k", Routes::bind(&MantisEndpoint::doBuildMst, this));
     }
 
     std::string urlDecode(std::string SRC) {
@@ -94,14 +97,46 @@ private:
 
         std::cout << qp << " " << op << " " << ip << std::endl;
 
-        auto console = spdlog::stdout_color_mt("mantis_console");
-
         QueryOpts qopt;
         qopt.console = console;
         qopt.prefix = qp;
         qopt.output = op;
         qopt.query_file = ip;
         int rp = mst_query_main(qopt);
+        std::cout << rp << std::endl;
+        response.send(Http::Code::Ok, "parameters received\n");
+    }
+
+    void doBuildMst(const Rest::Request& request, Http::ResponseWriter response) {
+        if (!request.hasParam(":p")) {
+            response.send(Http::Code::Bad_Request, "The path to directory where index is stored is required\n");
+        }
+        auto query_prefix = request.param(":p");
+        std::string qp = query_prefix.as<std::string>();
+        qp = urlDecode(qp);
+
+        int t = 1;
+        if (request.hasParam(":t")) {
+            auto threads = request.param(":t");
+            t = threads.as<int>();
+            //t = urlDecode(t);
+        }
+
+        int k = 1;
+        if (request.hasParam(":k")) {
+            auto keep = request.param(":k");
+            k = keep.as<int>();
+            //t = urlDecode(t);
+        }
+
+        std::cout << qp << " " << t << " " << k << std::endl;
+
+        QueryOpts qopt;
+        qopt.console = console;
+        qopt.prefix = qp;
+        qopt.keep_colorclasses = 1;
+        qopt.numThreads = t;
+        int rp = build_mst_main(qopt);
         std::cout << rp << std::endl;
         response.send(Http::Code::Ok, "parameters received\n");
     }
