@@ -13,7 +13,8 @@
 using namespace Pistache;
 
 int mst_query_main(QueryOpts &opt);
-int build_mst_main (QueryOpts& opt);
+int build_mst_main (QueryOpts &opt);
+int build_main(BuildOpts &opt);
 auto console = spdlog::stdout_color_mt("mantis_console");
 
 void printCookies(const Http::Request& req){
@@ -54,6 +55,7 @@ private:
         Routes::Get(router, "/auth", Routes::bind(&MantisEndpoint::doAuth, this));
         Routes::Post(router, "/query/:p/:o/:i", Routes::bind(&MantisEndpoint::doQuery, this));
         Routes::Post(router, "/build-mst/:p/:t/:k", Routes::bind(&MantisEndpoint::doBuildMst, this));
+        Routes::Post(router, "/build/:s/:i/:o", Routes::bind(&MantisEndpoint::doBuild, this));
     }
 
     std::string urlDecode(std::string SRC) {
@@ -137,6 +139,45 @@ private:
         qopt.keep_colorclasses = 1;
         qopt.numThreads = t;
         int rp = build_mst_main(qopt);
+        std::cout << rp << std::endl;
+        response.send(Http::Code::Ok, "parameters received\n");
+    }
+
+    void doBuild(const Rest::Request& request, Http::ResponseWriter response) {
+        // if (!request.hasParam(":s")) {
+        //     response.send(Http::Code::Bad_Request, "The path to directory where index is stored is required\n");
+        // }
+        // auto query_prefix = request.param(":p");
+        // std::string qp = query_prefix.as<std::string>();
+        // qp = urlDecode(qp);
+        int s = 1;
+        if (request.hasParam(":s")) {
+            auto squeakr = request.param(":s");
+            s = squeakr.as<int>();
+        }
+        
+        if (!request.hasParam(":i")) {
+            response.send(Http::Code::Bad_Request, "Input file is required\n");
+        }
+        auto input = request.param(":i");
+        std::string ip = input.as<std::string>();
+        ip = urlDecode(ip);
+
+        if (!request.hasParam(":o")) {
+            response.send(Http::Code::Bad_Request, "Output file is required\n");
+        }
+        auto output = request.param(":o");
+        std::string op = output.as<std::string>();
+        op = urlDecode(op);
+
+        std::cout << s << " " << ip << " " << op << std::endl;
+
+        BuildOpts bopt;
+        bopt.console = console;
+        bopt.qbits = s;
+        bopt.out = op;
+        bopt.inlist = ip;
+        int rp = build_main(bopt);
         std::cout << rp << std::endl;
         response.send(Http::Code::Ok, "parameters received\n");
     }
