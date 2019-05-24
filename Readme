@@ -1,0 +1,32 @@
+Check g++, zlib and sdsl-lite installations as required by mantis
+
+Install pistache from the following webpage:
+http://pistache.io/quickstart#installing-pistache
+
+Here is the process from the above site:
+cd pistache
+mkdir build
+cd build
+cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+make
+sudo make install
+
+Type this command on terminal:
+export LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+
+Now go to mantis folder and build and make as usual. 
+
+Run the server in the bin folder: ./bin/rserver
+
+Make curl requests to the server:
+Example curl requests:
+
+curl -X POST http://localhost:9080/query/raw%2F/query.res/raw%2Finput_txns.fa/
+
+curl -X POST http://localhost:9080/build-mst/raw%2F/1/0/
+
+curl -X POST http://localhost:9080/build/20/raw%2Finput_txns.fa/raw%2F/
+
+
+
+
