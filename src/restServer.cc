@@ -91,7 +91,7 @@ private:
         op = urlDecode(op);
 
         if (!request.hasParam(":i")) {
-            response.send(Http::Code::Bad_Request, "Input file is required\n");
+            response.send(Http::Code::Bad_Request, "Input kmer is required\n");
         }
         auto input = request.param(":i");
         std::string ip = input.as<std::string>();
@@ -104,9 +104,18 @@ private:
         qopt.prefix = qp;
         qopt.output = op;
         qopt.query_file = ip;
+        qopt.input_kmer = ip;
+        std::string resp = "";
         int rp = mst_query_main(qopt);
+        std::ifstream opfile(op);
+        std::string read;
+        std::cout << "\n\nhere\n\n" << std::endl;
+        while (opfile >> read) {
+            std::cout << read << std::endl;
+            resp += read + "\n";
+        }
         std::cout << rp << std::endl;
-        response.send(Http::Code::Ok, "parameters received\n");
+        response.send(Http::Code::Ok, resp);
     }
 
     void doBuildMst(const Rest::Request& request, Http::ResponseWriter response) {
@@ -144,12 +153,6 @@ private:
     }
 
     void doBuild(const Rest::Request& request, Http::ResponseWriter response) {
-        // if (!request.hasParam(":s")) {
-        //     response.send(Http::Code::Bad_Request, "The path to directory where index is stored is required\n");
-        // }
-        // auto query_prefix = request.param(":p");
-        // std::string qp = query_prefix.as<std::string>();
-        // qp = urlDecode(qp);
         int s = 1;
         if (request.hasParam(":s")) {
             auto squeakr = request.param(":s");

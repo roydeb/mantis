@@ -541,16 +541,26 @@ int mst_query_main(QueryOpts &opt) {
             }
             opfile << "]\n";
         } else {
-            while (ipfile >> read) {
-                mstQuery.reset();
-                mstQuery.parseKmers(read, indexK);
-                mstQuery.findSamples(cqf, cache_lru, &rs, queryStats);
-                if (mstQuery.indexK == mstQuery.queryK)
-                    output_results(mstQuery, opfile, sampleNames, queryStats);
-                else
-                    output_results(read, mstQuery, opfile, sampleNames, queryStats);
-                numOfQueries++;
-            }
+            // while (ipfile >> read) {
+            //     cout << read << "\nsahdj\n"<< indexK << opt.input_kmer << endl;
+            //     mstQuery.reset();
+            //     mstQuery.parseKmers(read, indexK);
+            //     mstQuery.findSamples(cqf, cache_lru, &rs, queryStats);
+            //     if (mstQuery.indexK == mstQuery.queryK)
+            //         output_results(mstQuery, opfile, sampleNames, queryStats);
+            //     else
+            //         output_results(read, mstQuery, opfile, sampleNames, queryStats);
+            //     numOfQueries++;
+            // }
+            cout << indexK << opt.input_kmer << endl;
+            mstQuery.reset();
+            mstQuery.parseKmers(opt.input_kmer, indexK);
+            mstQuery.findSamples(cqf, cache_lru, &rs, queryStats);
+            if (mstQuery.indexK == mstQuery.queryK)
+                output_results(mstQuery, opfile, sampleNames, queryStats);
+            else
+                output_results(opt.input_kmer, mstQuery, opfile, sampleNames, queryStats);
+            numOfQueries++;
         }
     }
     opfile.close();

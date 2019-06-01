@@ -30,6 +30,7 @@ class QueryOpts {
   std::string prefix;
   std::string output{"samples.output"};
   std::string query_file;
+  std::string input_kmer;
   uint64_t k = 0;
   uint32_t numThreads = 1;
   bool use_json{false};
