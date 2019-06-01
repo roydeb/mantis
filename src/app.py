@@ -19,7 +19,6 @@ def process_query():
     url += '/'
     url += urllib.quote(req_data['input'], safe='')
     #send the query make a post call
-    import pdb;pdb.set_trace()
     resp = requests.post(url)
     #retrieve the response and send the response back to the caller
     response['data'] = resp.text
